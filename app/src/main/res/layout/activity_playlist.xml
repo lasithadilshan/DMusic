@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PlaylistActivity">
+
+    <TextView
+        android:id="@+id/toolbarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Play List"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="#2C2E5B"
+        android:textColor="#FFFFFF"/>
+
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/toolbarTitle"
+        android:layout_alignBottom="@+id/toolbarTitle"
+        android:layout_alignParentStart="true"
+        android:layout_margin="8dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="-16dp"
+        android:contentDescription="Back"
+        android:src="@drawable/ic_back" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/toolbarTitle"
+        android:padding="16dp"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/playlistNameView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="Playlist Name" />
+
+        <ImageButton
+            android:id="@+id/playAllButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_play"
+            android:background="?attr/selectableItemBackground"
+            android:contentDescription="Play All"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlistRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp" />
+
+</RelativeLayout>
