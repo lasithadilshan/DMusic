@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -32,6 +33,8 @@ public class PlaySongActivity extends AppCompatActivity {
     private ArrayList<Song> playlistSongsList;
     private int currentSongIndex = 0;
     private static final String TAG = "PlaySongActivity";
+    private Handler seekBarHandler;
+    private Runnable updateSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,36 @@ public class PlaySongActivity extends AppCompatActivity {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnCompletionListener(mp -> playNextSong());
 
+        seekBarHandler = new Handler();
+        updateSeekBar = new Runnable() {
+            @Override
+            public void run() {
+                if (mediaPlayer != null) {
+                    seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                    seekBarHandler.postDelayed(this, 1000);
+                }
+            }
+        };
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mediaPlayer.seekTo(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+        });
+
         if (playlistSongsList != null && !playlistSongsList.isEmpty()) {
             Log.d(TAG, "Playlist loaded with " + playlistSongsList.size() + " songs.");
             playSong(currentSongIndex);
@@ -95,6 +128,8 @@ public class PlaySongActivity extends AppCompatActivity {
             mediaPlayer.prepare();
             mediaPlayer.start();
             playButton.setImageResource(android.R.drawable.ic_media_pause);
+            seekBar.setMax(mediaPlayer.getDuration());
+            seekBarHandler.postDelayed(updateSeekBar, 0);
         } catch (Exception e) {
             Log.e(TAG, "Error playing song: " + e.getMessage(), e);
         }
@@ -144,6 +179,7 @@ public class PlaySongActivity extends AppCompatActivity {
         super.onDestroy();
         if (mediaPlayer != null) {
             mediaPlayer.release();
+            seekBarHandler.removeCallbacks(updateSeekBar);
         }
     }
 
