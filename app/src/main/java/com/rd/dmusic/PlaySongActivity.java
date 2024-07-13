@@ -148,7 +148,7 @@ public class PlaySongActivity extends AppCompatActivity {
             mediaPlayer.setDataSource(song.getPath());
             mediaPlayer.prepare();
             mediaPlayer.start();
-            playButton.setImageResource(android.R.drawable.ic_media_pause);
+            playButton.setImageResource(R.drawable.ic_pause);
             seekBar.setMax(mediaPlayer.getDuration());
             seekBarHandler.postDelayed(updateSeekBar, 0);
         } catch (Exception e) {
@@ -169,10 +169,10 @@ public class PlaySongActivity extends AppCompatActivity {
     private void playPauseSong() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
-            playButton.setImageResource(android.R.drawable.ic_media_play);
+            playButton.setImageResource(R.drawable.ic_play);
         } else {
             mediaPlayer.start();
-            playButton.setImageResource(android.R.drawable.ic_media_pause);
+            playButton.setImageResource(R.drawable.ic_pause);
         }
     }
 

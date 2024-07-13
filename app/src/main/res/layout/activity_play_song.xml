@@ -38,12 +38,15 @@
 
     <ImageView
         android:id="@+id/albumCover"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="450dp"
         android:layout_below="@+id/tabs"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/default_album_cover" />
+        android:layout_marginTop="0dp"
+        android:adjustViewBounds="true"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/default_album_art_all" />
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -56,10 +59,12 @@
         android:id="@+id/songName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Song Name"
-        android:textSize="16sp"
         android:layout_below="@id/seekBar"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:padding="16dp"
+        android:text="Song Name"
+        android:textAlignment="center"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/artistName"
@@ -84,7 +89,8 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_prev"
             android:layout_weight="1"
-            android:contentDescription="Previous"/>
+            android:contentDescription="Previous"
+            android:background="@color/white"/>
 
         <ImageButton
             android:id="@+id/playButton"
@@ -92,6 +98,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_play"
             android:layout_weight="1"
+            android:background="@color/white"
             android:contentDescription="Play"/>
 
         <ImageButton
@@ -100,6 +107,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_next"
             android:layout_weight="1"
+            android:background="@color/white"
             android:contentDescription="Next"/>
     </LinearLayout>
 </RelativeLayout>
