@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,7 +15,7 @@ import java.util.ArrayList;
 
 public class PlaylistActivity extends AppCompatActivity {
 
-    private TextView playlistNameView;
+    private TextView playlistNameView, nowPlayingSongTitle;
     private RecyclerView playlistRecyclerView;
     private PlaylistSongsAdapter songsAdapter;
     private ArrayList<Song> playlistSongsList = new ArrayList<>();
@@ -26,6 +28,7 @@ public class PlaylistActivity extends AppCompatActivity {
         setContentView(R.layout.activity_playlist);
 
         playlistNameView = findViewById(R.id.playlistNameView);
+        nowPlayingSongTitle = findViewById(R.id.nowPlayingSongTitle); // TextView for displaying now playing song
         playlistRecyclerView = findViewById(R.id.playlistRecyclerView);
         ImageButton playAllButton = findViewById(R.id.playAllButton);
         ImageView backButton = findViewById(R.id.backButton);
@@ -34,7 +37,6 @@ public class PlaylistActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String playlistName = intent.getStringExtra("playlistName");
         playlistSongsList = (ArrayList<Song>) intent.getSerializableExtra("playlistSongsList");
-
         playlistNameView.setText(playlistName);
 
         playlistRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -60,6 +62,7 @@ public class PlaylistActivity extends AppCompatActivity {
     private void playSong(int position) {
         currentSongIndex = position;
         Song song = playlistSongsList.get(position);
+        nowPlayingSongTitle.setText("Now Playing: " + song.getTitle()); // Update the now playing text
         try {
             mediaPlayer.reset();
             mediaPlayer.setDataSource(song.getPath());
@@ -67,6 +70,7 @@ public class PlaylistActivity extends AppCompatActivity {
             mediaPlayer.start();
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(this, "Error playing song", Toast.LENGTH_SHORT).show(); // Show error message
         }
     }
 
@@ -75,6 +79,7 @@ public class PlaylistActivity extends AppCompatActivity {
             playSong(currentSongIndex + 1);
         } else {
             mediaPlayer.stop();
+            nowPlayingSongTitle.setText("Playlist ended."); // Update when playlist ends
         }
     }
 

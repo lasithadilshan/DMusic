@@ -9,16 +9,18 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -41,6 +43,11 @@ public class PlaySongActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_song);
 
+        initializeViews();
+        checkStoragePermission();
+    }
+
+    private void initializeViews() {
         songNameView = findViewById(R.id.songName);
         artistNameView = findViewById(R.id.artistName);
         albumCoverView = findViewById(R.id.albumCover);
@@ -50,7 +57,9 @@ public class PlaySongActivity extends AppCompatActivity {
         nextButton = findViewById(R.id.nextButton);
         ImageView backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> onBackPressed());
+    }
 
+    private void checkStoragePermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
         } else {
@@ -59,21 +68,42 @@ public class PlaySongActivity extends AppCompatActivity {
     }
 
     private void initializeMediaPlayer() {
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnCompletionListener(mp -> playNextSong());
+        setupMediaPlayerListeners();
+        setupSeekBar();
+
+        // Retrieve the playlist safely
         playlistSongsList = (ArrayList<Song>) getIntent().getSerializableExtra("songsList");
         currentSongIndex = getIntent().getIntExtra("songIndex", 0);
 
+        // Check if the playlist is null or empty
+        if (playlistSongsList == null || playlistSongsList.isEmpty()) {
+            Log.e(TAG, "Playlist is empty or not loaded.");
+            // Use runOnUiThread to ensure the Toast is shown on the UI thread
+            runOnUiThread(() -> {
+                Toast.makeText(this, "The playlist is empty or cannot be loaded.", Toast.LENGTH_LONG).show();
+            });
+            finish(); // Close this activity as there's nothing to play
+        } else {
+            playSong(currentSongIndex); // Play the song if the list is valid
+        }
+    }
+
+
+
+    private void setupMediaPlayerListeners() {
         playButton.setOnClickListener(v -> playPauseSong());
         prevButton.setOnClickListener(v -> playPreviousSong());
         nextButton.setOnClickListener(v -> playNextSong());
+    }
 
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setOnCompletionListener(mp -> playNextSong());
-
+    private void setupSeekBar() {
         seekBarHandler = new Handler();
         updateSeekBar = new Runnable() {
             @Override
             public void run() {
-                if (mediaPlayer != null) {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                     seekBar.setProgress(mediaPlayer.getCurrentPosition());
                     seekBarHandler.postDelayed(this, 1000);
                 }
@@ -90,21 +120,12 @@ public class PlaySongActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                // Do nothing
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                // Do nothing
             }
         });
-
-        if (playlistSongsList != null && !playlistSongsList.isEmpty()) {
-            Log.d(TAG, "Playlist loaded with " + playlistSongsList.size() + " songs.");
-            playSong(currentSongIndex);
-        } else {
-            Log.e(TAG, "Playlist is empty or not loaded.");
-        }
     }
 
     private void playSong(int index) {
@@ -138,13 +159,11 @@ public class PlaySongActivity extends AppCompatActivity {
     private Bitmap getAlbumArt(long albumId) {
         Uri albumArtUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId);
         try (InputStream inputStream = getContentResolver().openInputStream(albumArtUri)) {
-            if (inputStream != null) {
-                return BitmapFactory.decodeStream(inputStream);
-            }
+            return BitmapFactory.decodeStream(inputStream);
         } catch (Exception e) {
             Log.e(TAG, "Error retrieving album art", e);
+            return null;
         }
-        return null;
     }
 
     private void playPauseSong() {
@@ -180,6 +199,7 @@ public class PlaySongActivity extends AppCompatActivity {
         if (mediaPlayer != null) {
             mediaPlayer.release();
             seekBarHandler.removeCallbacks(updateSeekBar);
+            mediaPlayer = null;
         }
     }
 
@@ -189,8 +209,7 @@ public class PlaySongActivity extends AppCompatActivity {
         if (requestCode == STORAGE_PERMISSION_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             initializeMediaPlayer();
         } else {
-            Log.e(TAG, "Permission denied to read external storage");
-            // Handle the case where permission is not granted
+            Toast.makeText(this, "Permission denied to read external storage", Toast.LENGTH_SHORT).show();
         }
     }
 }

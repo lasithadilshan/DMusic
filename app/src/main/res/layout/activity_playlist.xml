@@ -61,10 +61,22 @@
             android:contentDescription="Play All"/>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/nowPlayingSongTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/playlistRecyclerView"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:text="Now Playing: None"
+        android:textColor="#FF0000"
+        android:textStyle="italic"
+        android:gravity="center"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playlistRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp" />
+        android:layout_height="wrap_content"
+        android:padding="16dp"/>
 
 </RelativeLayout>
